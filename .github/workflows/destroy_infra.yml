@@ -6,15 +6,19 @@ on:
       project_id:
         description: "GCP Project ID (same as used in deploy)"
         required: true
+        default: 'project-id-1234'
       vpc_name:
         description: "VPC Name (same as used in deploy)"
         required: true
+        default: 'my-vpc'
       subnet_name:
         description: "Subnet Name (same as used in deploy)"
         required: true
+        default: 'my-subnet'
       instance_name:
         description: "Compute Engine Name (same as used in deploy)"
         required: true
+        default: 'my-instance'
 
 jobs:
   destroy:
