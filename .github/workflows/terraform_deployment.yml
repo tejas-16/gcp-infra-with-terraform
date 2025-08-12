@@ -6,15 +6,19 @@ on:
       project_id:
         description: "GCP Project ID"
         required: true
+        default: 'project-id-1234'
       vpc_name:
         description: "VPC Name"
         required: true
+        default: 'my-vpc'
       subnet_name:
         description: "Subnet Name"
         required: true
+        default: 'my-subnet'
       instance_name:
         description: "Compute Engine Name"
         required: true
+        default: 'my-instance'
 
 jobs:
   deploy:
