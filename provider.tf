@@ -5,11 +5,14 @@ terraform {
       version = "~> 5.0"
     }
   }
-  required_version = ">= 1.3.0"
+
+  backend "gcs" {
+    bucket = var.bucket_name_state
+    prefix = "terraform/state"
+  }
 }
 
 provider "google" {
-  credentials = file(var.gcp_credentials_file)
-  project     = var.project_id
-  region      = var.region
+  project = var.project_id
+  region  = var.region
 }
