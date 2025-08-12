@@ -1,0 +1,44 @@
+name: Destroy GCP Infra
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_id:
+        description: "GCP Project ID (same as used in deploy)"
+        required: true
+      vpc_name:
+        description: "VPC Name (same as used in deploy)"
+        required: true
+      subnet_name:
+        description: "Subnet Name (same as used in deploy)"
+        required: true
+      instance_name:
+        description: "Compute Engine Name (same as used in deploy)"
+        required: true
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Destroy
+        run: |
+          terraform destroy -auto-approve \
+            -var="project_id=${{ github.event.inputs.project_id }}" \
+            -var="vpc_name=${{ github.event.inputs.vpc_name }}" \
+            -var="subnet_name=${{ github.event.inputs.subnet_name }}" \
+            -var="instance_name=${{ github.event.inputs.instance_name }}"
