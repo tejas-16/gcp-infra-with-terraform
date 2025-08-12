@@ -4,30 +4,30 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: "Terraform action to perform"
+        description: 'Terraform action (plan/apply/destroy)'
         required: true
-        default: "plan"
+        default: 'plan'
         type: choice
         options:
           - plan
           - apply
           - destroy
       instance_name:
-        description: "Name of the Compute Engine instance"
+        description: 'Instance name'
         required: true
-        default: "my-instance"
+        default: 'my-instance'
       vpc_name:
-        description: "Name of the VPC network"
+        description: 'VPC name'
         required: true
-        default: "my-vpc"
+        default: 'my-vpc'
       subnet_name:
-        description: "Name of the subnet"
+        description: 'Subnet name'
         required: true
-        default: "my-subnet"
+        default: 'my-subnet'
       bucket_name:
-        description: "Name of the storage bucket"
+        description: 'Bucket name'
         required: true
-        default: "my-bucket"
+        default: 'my-bucket'
 
 jobs:
   terraform:
@@ -37,50 +37,28 @@ jobs:
       id-token: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.5.0
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
 
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+    - name: Terraform Init
+      run: terraform init
 
-      - name: Terraform Init
-        run: terraform init
+    - name: Terraform Plan
+      if: github.event.inputs.action == 'plan'
+      run: terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID }}" -var="instance_name=${{ github.event.inputs.instance_name }}" -var="vpc_name=${{ github.event.inputs.vpc_name }}" -var="subnet_name=${{ github.event.inputs.subnet_name }}" -var="bucket_name=${{ github.event.inputs.bucket_name }}"
 
-      - name: Terraform Plan
-        if: github.event.inputs.action == 'plan'
-        run: terraform plan \
-          -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
-          -var="instance_name=${{ github.event.inputs.instance_name }}" \
-          -var="vpc_name=${{ github.event.inputs.vpc_name }}" \
-          -var="subnet_name=${{ github.event.inputs.subnet_name }}" \
-          -var="bucket_name=${{ github.event.inputs.bucket_name }}"
+    - name: Terraform Apply
+      if: github.event.inputs.action == 'apply'
+      run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID }}" -var="instance_name=${{ github.event.inputs.instance_name }}" -var="vpc_name=${{ github.event.inputs.vpc_name }}" -var="subnet_name=${{ github.event.inputs.subnet_name }}" -var="bucket_name=${{ github.event.inputs.bucket_name }}"
 
-      - name: Terraform Apply
-        if: github.event.inputs.action == 'apply'
-        run: terraform apply -auto-approve \
-          -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
-          -var="instance_name=${{ github.event.inputs.instance_name }}" \
-          -var="vpc_name=${{ github.event.inputs.vpc_name }}" \
-          -var="subnet_name=${{ github.event.inputs.subnet_name }}" \
-          -var="bucket_name=${{ github.event.inputs.bucket_name }}"
-
-      - name: Terraform Destroy
-        if: github.event.inputs.action == 'destroy'
-        run: terraform destroy -auto-approve \
-          -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
-          -var="instance_name=${{ github.event.inputs.instance_name }}" \
-          -var="vpc_name=${{ github.event.inputs.vpc_name }}" \
-          -var="subnet_name=${{ github.event.inputs.subnet_name }}" \
-          -var="bucket_name=${{ github.event.inputs.bucket_name }}"
+    - name: Terraform Destroy
+      if: github.event.inputs.action == 'destroy'
+      run: terraform destroy -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID }}" -var="instance_name=${{ github.event.inputs.instance_name }}" -var="vpc_name=${{ github.event.inputs.vpc_name }}" -var="subnet_name=${{ github.event.inputs.subnet_name }}" -var="bucket_name=${{ github.event.inputs.bucket_name }}"
