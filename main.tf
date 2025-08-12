@@ -1,22 +1,22 @@
 # Create VPC
-resource "google_compute_network" "vpc_network" {
+resource "google_compute_network" "custom_vpc" {
   name                    = var.vpc_name
   auto_create_subnetworks = false
 }
 
 # Create Subnet
-resource "google_compute_subnetwork" "subnet" {
+resource "google_compute_subnetwork" "custom_subnet" {
   name          = var.subnet_name
   ip_cidr_range = "10.0.0.0/24"
   region        = var.region
-  network       = google_compute_network.vpc_network.id
+  network       = google_compute_network.custom_vpc.id
 }
 
-# Create VM instance
+# Create Compute Engine VM
 resource "google_compute_instance" "vm_instance" {
   name         = var.instance_name
   machine_type = "e2-micro"
-  zone         = "${var.region}-a"
+  zone         = var.zone
 
   boot_disk {
     initialize_params {
@@ -25,14 +25,8 @@ resource "google_compute_instance" "vm_instance" {
   }
 
   network_interface {
-    network    = google_compute_network.vpc_network.id
-    subnetwork = google_compute_subnetwork.subnet.id
+    network    = google_compute_network.custom_vpc.id
+    subnetwork = google_compute_subnetwork.custom_subnet.id
     access_config {}
   }
-}
-
-# Create Storage Bucket
-resource "google_storage_bucket" "bucket" {
-  name     = var.bucket_name
-  location = var.region
 }
