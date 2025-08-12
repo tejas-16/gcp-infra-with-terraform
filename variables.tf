@@ -5,20 +5,21 @@ variable "project_id" {
 
 variable "region" {
   description = "GCP Region"
-  type        = string
+  type = string
+  default = "us-central1-a"
 }
 
 variable "vpc_name" {
   description = "VPC name"
-  type        = string
+  type = string
 }
 
 variable "subnet_name" {
   description = "Subnet name"
-  type        = string
+  type = string
 }
 
 variable "instance_name" {
   description = "Compute Engine instance name"
-  type        = string
+  type = string
 }
