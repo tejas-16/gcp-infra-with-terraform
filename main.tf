@@ -1,3 +1,17 @@
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "google" {
+  project = var.project_id
+  region  = "us-central1"
+}
+
 # Create VPC
 resource "google_compute_network" "custom_vpc" {
   name                    = var.vpc_name
@@ -8,22 +22,15 @@ resource "google_compute_network" "custom_vpc" {
 resource "google_compute_subnetwork" "custom_subnet" {
   name          = var.subnet_name
   ip_cidr_range = "10.0.0.0/24"
-  region        = var.region
+  region        = "us-central1"
   network       = google_compute_network.custom_vpc.id
 }
 
-# Create Cloud Storage Bucket
-resource "google_storage_bucket" "bucket" {
-  name          = var.bucket_name
-  location      = var.region
-  force_destroy = true
-}
-
-# Create Compute Instance
+# Create Instance
 resource "google_compute_instance" "vm_instance" {
   name         = var.instance_name
   machine_type = "e2-micro"
-  zone         = "${var.region}-a"
+  zone         = "us-central1-a"
 
   boot_disk {
     initialize_params {
@@ -33,9 +40,13 @@ resource "google_compute_instance" "vm_instance" {
 
   network_interface {
     subnetwork = google_compute_subnetwork.custom_subnet.id
-
-    access_config {
-      # Assign external IP
-    }
+    access_config {}
   }
+}
+
+# Create GCS Bucket
+resource "google_storage_bucket" "bucket" {
+  name          = var.bucket_name
+  location      = "US"
+  force_destroy = true
 }
