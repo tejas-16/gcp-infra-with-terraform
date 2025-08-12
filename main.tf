@@ -16,7 +16,7 @@ resource "google_compute_subnetwork" "custom_subnet" {
 resource "google_compute_instance" "vm_instance" {
   name         = var.instance_name
   machine_type = "e2-micro"
-  zone    = var.zone
+  zone         = var.zone
 
   boot_disk {
     initialize_params {
