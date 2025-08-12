@@ -1,20 +1,8 @@
-name: Terraform GCP Infra Deployment
+name: Terraform GCP Deployment
 
 on:
   workflow_dispatch:
     inputs:
-      vpc_name:
-        description: "VPC name"
-        required: true
-      subnet_name:
-        description: "Subnet name"
-        required: true
-      bucket_name:
-        description: "Bucket name"
-        required: true
-      instance_name:
-        description: "Compute Engine instance name"
-        required: true
       action:
         description: "Terraform action to perform"
         required: true
@@ -24,6 +12,18 @@ on:
           - plan
           - apply
           - destroy
+      instance_name:
+        description: "VM Instance Name"
+        required: true
+      vpc_name:
+        description: "VPC Name"
+        required: true
+      subnet_name:
+        description: "Subnet Name"
+        required: true
+      bucket_name:
+        description: "Bucket Name"
+        required: true
 
 jobs:
   terraform:
@@ -58,27 +58,27 @@ jobs:
         run: terraform plan \
           -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
           -var="gcp_credentials_file=service-account.json" \
+          -var="instance_name=${{ github.event.inputs.instance_name }}" \
           -var="vpc_name=${{ github.event.inputs.vpc_name }}" \
           -var="subnet_name=${{ github.event.inputs.subnet_name }}" \
-          -var="bucket_name=${{ github.event.inputs.bucket_name }}" \
-          -var="instance_name=${{ github.event.inputs.instance_name }}"
+          -var="bucket_name=${{ github.event.inputs.bucket_name }}"
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply'
         run: terraform apply -auto-approve \
           -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
           -var="gcp_credentials_file=service-account.json" \
+          -var="instance_name=${{ github.event.inputs.instance_name }}" \
           -var="vpc_name=${{ github.event.inputs.vpc_name }}" \
           -var="subnet_name=${{ github.event.inputs.subnet_name }}" \
-          -var="bucket_name=${{ github.event.inputs.bucket_name }}" \
-          -var="instance_name=${{ github.event.inputs.instance_name }}"
+          -var="bucket_name=${{ github.event.inputs.bucket_name }}"
 
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
         run: terraform destroy -auto-approve \
           -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
           -var="gcp_credentials_file=service-account.json" \
+          -var="instance_name=${{ github.event.inputs.instance_name }}" \
           -var="vpc_name=${{ github.event.inputs.vpc_name }}" \
           -var="subnet_name=${{ github.event.inputs.subnet_name }}" \
-          -var="bucket_name=${{ github.event.inputs.bucket_name }}" \
-          -var="instance_name=${{ github.event.inputs.instance_name }}"
+          -var="bucket_name=${{ github.event.inputs.bucket_name }}"
