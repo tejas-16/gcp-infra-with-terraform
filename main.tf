@@ -9,7 +9,6 @@ resource "google_compute_subnetwork" "custom_subnet" {
   name          = var.subnet_name
   ip_cidr_range = "10.0.0.0/24"
   region        = var.region
-  zone    = var.zone
   network       = google_compute_network.custom_vpc.id
 }
 
@@ -17,6 +16,7 @@ resource "google_compute_subnetwork" "custom_subnet" {
 resource "google_compute_instance" "vm_instance" {
   name         = var.instance_name
   machine_type = "e2-micro"
+  zone    = var.zone
 
   boot_disk {
     initialize_params {
