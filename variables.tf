@@ -1,30 +1,24 @@
 variable "project_id" {
-  type        = string
   description = "GCP Project ID"
+  type        = string
 }
 
 variable "region" {
-  type        = string
-  default     = "us-central1"
-}
-
-variable "instance_name" {
+  description = "GCP Region"
   type        = string
 }
 
 variable "vpc_name" {
+  description = "VPC name"
   type        = string
 }
 
 variable "subnet_name" {
+  description = "Subnet name"
   type        = string
 }
 
-variable "bucket_name" {
+variable "instance_name" {
+  description = "Compute Engine instance name"
   type        = string
-}
-
-variable "bucket_name_state" {
-  type        = string
-  description = "Name of the GCS bucket for Terraform state"
 }
