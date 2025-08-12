@@ -1,21 +1,35 @@
 variable "project_id" {
-  description = "The GCP project ID"
+  description = "GCP Project ID"
+  type        = string
+}
+
+variable "gcp_credentials_file" {
+  description = "Path to GCP credentials JSON"
   type        = string
 }
 
 variable "region" {
-  description = "The GCP region"
+  description = "GCP region"
   type        = string
   default     = "us-central1"
 }
 
-variable "zone" {
-  description = "The GCP zone"
+variable "vpc_name" {
+  description = "Name of the VPC"
   type        = string
-  default     = "us-central1-a"
 }
 
-variable "gcp_credentials_file" {
-  description = "Path to the GCP service account key file"
+variable "subnet_name" {
+  description = "Name of the subnet"
+  type        = string
+}
+
+variable "bucket_name" {
+  description = "Name of the GCS bucket"
+  type        = string
+}
+
+variable "instance_name" {
+  description = "Name of the Compute Engine instance"
   type        = string
 }
