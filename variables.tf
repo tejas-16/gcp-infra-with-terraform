@@ -5,8 +5,14 @@ variable "project_id" {
 
 variable "region" {
   description = "GCP Region"
-  type = string
-  default = "us-central1-a"
+  type        = string
+  default     = "us-central1"
+}
+
+variable "zone" {
+  description = "GCP Zone"
+  type        = string
+  default     = "us-central1-a"
 }
 
 variable "vpc_name" {
