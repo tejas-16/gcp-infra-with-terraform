@@ -1,57 +1,55 @@
-name: Terraform GCP Deploy
+name: Deploy GCP Infra
 
 on:
   workflow_dispatch:
     inputs:
       project_id:
-        description: 'Enter your GCP Project ID'
+        description: "GCP Project ID"
         required: true
-      region:
-        description: 'Enter GCP Region'
-        required: true
-        default: 'us-central1'
       vpc_name:
-        description: 'Enter VPC Name'
+        description: "VPC Name"
         required: true
       subnet_name:
-        description: 'Enter Subnet Name'
+        description: "Subnet Name"
         required: true
       instance_name:
-        description: 'Enter Compute Engine Instance Name'
+        description: "Compute Engine Name"
         required: true
 
 jobs:
-  terraform:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
+      - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.6
 
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Terraform Init
         run: terraform init
 
+      - name: Terraform Validate
+        run: terraform validate
+
       - name: Terraform Plan
-        run: terraform plan \
-          -var="project_id=${{ github.event.inputs.project_id }}" \
-          -var="region=${{ github.event.inputs.region }}" \
-          -var="vpc_name=${{ github.event.inputs.vpc_name }}" \
-          -var="subnet_name=${{ github.event.inputs.subnet_name }}" \
-          -var="instance_name=${{ github.event.inputs.instance_name }}"
+        run: |
+          terraform plan \
+            -var="project_id=${{ github.event.inputs.project_id }}" \
+            -var="vpc_name=${{ github.event.inputs.vpc_name }}" \
+            -var="subnet_name=${{ github.event.inputs.subnet_name }}" \
+            -var="instance_name=${{ github.event.inputs.instance_name }}"
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve \
-          -var="project_id=${{ github.event.inputs.project_id }}" \
-          -var="region=${{ github.event.inputs.region }}" \
-          -var="vpc_name=${{ github.event.inputs.vpc_name }}" \
-          -var="subnet_name=${{ github.event.inputs.subnet_name }}" \
-          -var="instance_name=${{ github.event.inputs.instance_name }}"
+        run: |
+          terraform apply -auto-approve \
+            -var="project_id=${{ github.event.inputs.project_id }}" \
+            -var="vpc_name=${{ github.event.inputs.vpc_name }}" \
+            -var="subnet_name=${{ github.event.inputs.subnet_name }}" \
+            -var="instance_name=${{ github.event.inputs.instance_name }}"
